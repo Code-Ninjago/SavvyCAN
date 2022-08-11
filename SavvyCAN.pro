@@ -20,6 +20,7 @@ QMAKE_INFO_PLIST = Info.plist.template
 ICON = icons/SavvyIcon.icns
 
 SOURCES += main.cpp\
+    connections/kvaserconnection.cpp \
     connections/mqtt_bus.cpp \
     mqtt/qmqtt_client.cpp \
     mqtt/qmqtt_client_p.cpp \
@@ -98,6 +99,11 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     can_structs.h \
     canframemodel.h \
+    connections/candemo.h \
+    connections/canevt.h \
+    connections/canlib.h \
+    connections/kvaserconnection.h \
+    connections/predef.h \
     connections/socketcand.h \
     connections/mqtt_bus.h \
     mqtt/qmqtt.h \
@@ -251,3 +257,8 @@ INSTALLS += helpfiles
 
 INSTALLS += target
 
+
+win32: LIBS += -L$$PWD/lib/ -lcanlib32
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
