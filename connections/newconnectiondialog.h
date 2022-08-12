@@ -30,6 +30,8 @@ public slots:
     void handleDeviceTypeChanged();
     void handleCreateButton();
 
+private slots:
+
 private:
     Ui::NewConnectionDialog *ui;
     QList<QSerialPortInfo> ports;
@@ -43,6 +45,7 @@ private:
     void selectRemote();
     void selectKayak();
     void selectMQTT();
+    void selectKvaserApi();
     bool isSerialBusAvailable();
     void setPortName(CANCon::type pType, QString pPortName, QString pDriver);
 };

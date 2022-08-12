@@ -6,7 +6,7 @@
 #define MAX_CHANNELS 63   //cannot be more because waitforsingle object can "only" handle 64 events
 
 //includes
-#include <canlib.h>
+#include "canlib.h"
 
 
 //for debug/error purposes

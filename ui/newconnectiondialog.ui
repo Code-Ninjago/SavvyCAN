@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>356</width>
-    <height>282</height>
+    <height>361</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,16 +23,6 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="rbGVRET">
-        <property name="text">
-         <string>Serial Connection (GVRET)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QRadioButton" name="rbRemote">
         <property name="text">
@@ -40,7 +30,7 @@
         </property>
        </widget>
       </item>
-	  <item row="2" column="0">
+      <item row="2" column="0">
        <widget class="QRadioButton" name="rbSocketCAN">
         <property name="enabled">
          <bool>false</bool>
@@ -57,10 +47,27 @@
         </property>
        </widget>
       </item>
-	  <item row="4" column="0">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="rbGVRET">
+        <property name="text">
+         <string>Serial Connection (GVRET)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QRadioButton" name="rbMQTT">
         <property name="text">
          <string>MQTT Connection</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QRadioButton" name="rbKvaserApi">
+        <property name="text">
+         <string>Kvaser (API)</string>
         </property>
        </widget>
       </item>

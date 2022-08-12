@@ -27,6 +27,8 @@ NewConnectionDialog::NewConnectionDialog(QVector<QString>* gvretips, QVector<QSt
     connect(ui->rbRemote, &QAbstractButton::clicked, this, &NewConnectionDialog::handleConnTypeChanged);
     connect(ui->rbKayak, &QAbstractButton::clicked, this, &NewConnectionDialog::handleConnTypeChanged);
     connect(ui->rbMQTT, &QAbstractButton::clicked, this, &NewConnectionDialog::handleConnTypeChanged);
+    connect(ui->rbKvaserApi, &QAbstractButton::clicked, this, &NewConnectionDialog::handleConnTypeChanged);
+
 
     connect(ui->cbDeviceType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewConnectionDialog::handleDeviceTypeChanged);
     connect(ui->btnOK, &QPushButton::clicked, this, &NewConnectionDialog::handleCreateButton);
@@ -56,6 +58,7 @@ void NewConnectionDialog::handleConnTypeChanged()
     if (ui->rbRemote->isChecked()) selectRemote();
     if (ui->rbKayak->isChecked()) selectKayak();
     if (ui->rbMQTT->isChecked()) selectMQTT();
+    if (ui->rbKvaserApi->isChecked()) selectKvaserApi();
 }
 
 void NewConnectionDialog::handleDeviceTypeChanged()
@@ -123,6 +126,14 @@ void NewConnectionDialog::selectKayak()
 void NewConnectionDialog::selectMQTT()
 {
     ui->lPort->setText("Topic Name:");
+    ui->lblDeviceType->setHidden(true);
+    ui->cbDeviceType->setHidden(true);
+    ui->cbPort->clear();
+}
+
+void NewConnectionDialog::selectKvaserApi()
+{
+    ui->lPort->setText("Kvaser API:");
     ui->lblDeviceType->setHidden(true);
     ui->cbDeviceType->setHidden(true);
     ui->cbPort->clear();
@@ -237,3 +248,4 @@ bool NewConnectionDialog::isSerialBusAvailable()
     if (QCanBus::instance()->plugins().count() > 0) return true;
     return false;
 }
+
