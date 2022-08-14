@@ -262,3 +262,6 @@ win32: LIBS += -L$$PWD/lib/ -lcanlib32
 
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
+
+DISTFILES += \
+    lib/canlib32.lib
