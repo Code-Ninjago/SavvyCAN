@@ -212,6 +212,7 @@ QString NewConnectionDialog::getPortName()
     case CANCon::SERIALBUS:
     case CANCon::REMOTE:
     case CANCon::MQTT:
+    case CANCon::KVASER_API:
         return ui->cbPort->currentText();
     case CANCon::KAYAK:
         return ui->cbPort->currentText();
@@ -238,6 +239,7 @@ CANCon::type NewConnectionDialog::getConnectionType()
     if (ui->rbRemote->isChecked()) return CANCon::REMOTE;
     if (ui->rbKayak->isChecked()) return CANCon::KAYAK;
     if (ui->rbMQTT->isChecked()) return CANCon::MQTT;
+    if (ui->rbKvaserApi->isChecked()) return CANCon::KVASER_API;
     qDebug() << "getConnectionType: error";
 
     return CANCon::NONE;

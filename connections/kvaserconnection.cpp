@@ -14,8 +14,49 @@ driverData     m_channelData;
 driverData    *m_DriverConfig                 = &m_channelData;
 unsigned int   m_usedBaudRate                  = 0;
 
+int TransmitMessage()
+{
+    unsigned int m_useID = 0xCF2102A;
+    unsigned char msg[8];
+    int i = 0;
+    for (i = 0; i < 8; i++)
+    {
+        msg[i] = (unsigned char) i;
+    }
+
+    int x = canWrite(m_DriverConfig->channel[0].hnd, m_useID, msg, sizeof(msg), 4);
+    return x;
+}
+
+void printDriverConfig( void )
+{
+  unsigned int i;
+
+  printf("\nDriver Configuration:\n  ChannelCount=%u\n", m_DriverConfig->channelCount);
+  for (i = 0; i < m_DriverConfig->channelCount; i++) {
+
+    printf("  %s : Channel %d, isOnBus=%d, Baudrate=%u",
+           m_DriverConfig->channel[i].name,
+           m_DriverConfig->channel[i].channel,
+           m_DriverConfig->channel[i].isOnBus,
+           m_usedBaudRate);
+
+    printf("\n    ");
+
+    if (m_DriverConfig->channel[i].driverMode == canDRIVER_NORMAL) {
+      printf("Drivermode=canDRIVER_NORMAL\n");
+    } else {
+      printf ("Drivermode=canDRIVER_SILENT\n");
+    }
+  }
+
+  printf("\n\n");
+}
+
 void InitDriver()
 {
+    qDebug() << "Initialising Kvaser driver" << Qt::endl;
+
     int  i;
     canStatus  stat;
 
@@ -68,17 +109,37 @@ void InitDriver()
         stat = canSetBusParams(hnd, m_usedBaudRate, 0, 0, 0, 0, 0);
         qDebug() << stat;
     }
+    //we only looking at the physical channel for now, this is seen to be channel 0
 
 
+    //go on bus (channel 0 only)
+    stat = canBusOn(m_channelData.channel[0].hnd);
 
+    if(stat < 0)
+    {
+        qDebug() << "Error canBusOn(). Err " << stat << Qt::endl;
+    }
+    else
+    {
+        m_DriverConfig->channel[0].isOnBus = 1;
+    }
 
+    HANDLE tmp;
+    //get CAN - eventHandles
+        stat = canIoCtl(m_channelData.channel[0].hnd,
+                        canIOCTL_GET_EVENTHANDLE,
+                        &tmp,
+                        sizeof(tmp));
 
+    //Let's see if we can send a helloworld out over can
+    TransmitMessage();
 }
 
 KvaserConnection::KvaserConnection() :
     CANConnection("KAPI", "KAPI_DRIVER",CANCon::KVASER_API, 1, 4000, true),
     mTimer(this)
 {
+
 
 }
 
@@ -90,6 +151,11 @@ KvaserConnection::~KvaserConnection()
 
 void KvaserConnection::piStarted()
 {
+    InitDriver();
+    if(m_DriverConfig->channel[0].isOnBus == 0)
+    {
+        qDebug() << "Cannot transmit message, channel 0 is off bus" << Qt::endl;
+    }
 
 }
 
@@ -123,7 +189,9 @@ bool KvaserConnection::piSendFrame(const CANFrame &pFrame)
         msg[i] = pFrame.payload().at(i);
     }
 
-    canWrite(m_DriverConfig->channel[0].hnd, pFrame.frameId(), msg, sizeof(pFrame.payload()), 4);
+    canStatus stat = canWrite(m_DriverConfig->channel[0].hnd, pFrame.frameId(), msg, sizeof(pFrame.payload()), 4);
+
+    qDebug() << "kvaser can status: " << stat << Qt::endl;
 
 }
 
