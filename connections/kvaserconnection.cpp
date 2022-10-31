@@ -11,6 +11,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include "canlib.h"
+#include <QObject>
 
 driverData     m_channelData;
 driverData    *m_DriverConfig                 = &m_channelData;
@@ -172,6 +173,8 @@ KvaserConnection::KvaserConnection() :
     CANConnection("KAPI", "KAPI_DRIVER",CANCon::KVASER_API, 1, 4000, true),
     mTimer(this)
 {
+    QObject::connect(&mTimer, &QTimer::timeout, this, &KvaserConnection::timerSlot);
+    mTimer.start(1000);
 
 
 
@@ -262,5 +265,12 @@ void KvaserConnection::framesReceived()
 
 void KvaserConnection::testConnection()
 {
+
+}
+
+void KvaserConnection::timerSlot()
+{
+    static int counter = 0;
+    qDebug() << "Timer firing as expected: " << counter++ << Qt::endl;
 
 }

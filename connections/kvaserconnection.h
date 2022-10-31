@@ -45,6 +45,7 @@ private slots:
     void framesWritten(qint64 count);
     void framesReceived();
     void testConnection();
+    void timerSlot();
 
 protected:
     QTimer             mTimer;
