@@ -2,6 +2,8 @@
 #include "candemo.h"
 
 #include "canconmanager.h"
+#include "canconnection.h"
+#include "utility.h"
 
 
 #include <QCanBus>
@@ -13,6 +15,37 @@
 driverData     m_channelData;
 driverData    *m_DriverConfig                 = &m_channelData;
 unsigned int   m_usedBaudRate                  = 0;
+
+//The below queuing mechanism is magically getting this informaito to the GUI
+void KvaserConnection::testRecieve()
+{
+    CANFrame* frame_p = getQueue().get();
+    if(frame_p)
+    {
+        uint32_t frameID = 0x18F0042A;//message.topic().split("/")[1].toInt();
+        uint64_t timeStamp = 1002;/*message.payload()[0] + (message.payload()[1] << 8) + (message.payload()[2] << 16) + (message.payload()[3] << 24)
+                           + ((uint64_t)message.payload()[4] << 32ull)  + ((uint64_t)message.payload()[5] << 40ull)
+                           + ((uint64_t)message.payload()[6] << 48ull) + ((uint64_t)message.payload()[7] << 56ull);*/
+        int flags = 0;//message.payload()[8];
+        QByteArray arr("DEADBEEF");
+        frame_p->setPayload(arr);//(message.payload().right(message.payload().count() - 9));
+        frame_p->bus = 0;
+        frame_p->setExtendedFrameFormat(flags & 1);
+        frame_p->setFrameId(frameID);
+        frame_p->setFrameType(QCanBusFrame::DataFrame);
+        frame_p->isReceived = true;
+        if (0/*useSystemTime*/)
+        {
+            frame_p->setTimeStamp(QCanBusFrame::TimeStamp(0, QDateTime::currentMSecsSinceEpoch() * 1000ul));
+        }
+        else frame_p->setTimeStamp(QCanBusFrame::TimeStamp(0, timeStamp));
+
+        checkTargettedFrame(*frame_p);
+
+        /* enqueue frame */
+        getQueue().queue();
+    }
+}
 
 int TransmitMessage()
 {
@@ -141,6 +174,7 @@ KvaserConnection::KvaserConnection() :
 {
 
 
+
 }
 
 KvaserConnection::~KvaserConnection()
@@ -156,6 +190,8 @@ void KvaserConnection::piStarted()
     {
         qDebug() << "Cannot transmit message, channel 0 is off bus" << Qt::endl;
     }
+
+    testRecieve();
 
 }
 
@@ -207,6 +243,20 @@ void KvaserConnection::framesWritten(qint64 count)
 
 void KvaserConnection::framesReceived()
 {
+    while(true)
+    {
+        long id;
+        uint8_t msg[8];
+        unsigned int dlc, flag;
+        unsigned long time;
+        int stat = canRead(m_DriverConfig->channel[0].hnd, &id, msg, &dlc, &flag, &time);
+
+        if(stat == canOK)
+        {
+            qDebug() << id << Qt::endl;
+
+        }
+    }
 
 }
 

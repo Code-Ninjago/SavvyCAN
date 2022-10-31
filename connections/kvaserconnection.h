@@ -1,7 +1,11 @@
 #ifndef KVASERCONNECTION_H
 #define KVASERCONNECTION_H
 
-#endif // KVASERCONNECTION_H
+
+
+#include "canconnection.h"
+#include "canconmanager.h"
+#include "canframemodel.h"
 
 #include <QSerialPort>
 #include <QCanBusDevice>
@@ -23,6 +27,7 @@ class KvaserConnection : public CANConnection
 public:
     KvaserConnection();
     virtual ~KvaserConnection();
+    void testRecieve();
 
 protected:
 
@@ -45,5 +50,5 @@ protected:
     QTimer             mTimer;
 };
 
-
+#endif // KVASERCONNECTION_H
 
