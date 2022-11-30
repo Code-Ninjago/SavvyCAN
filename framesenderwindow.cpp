@@ -897,7 +897,7 @@ void FrameSenderWindow::processCellChange(int line, int col)
             break;
         case 6: //Data bytes
             for (int i = 0; i < 8; i++) sendingData[line].payload().data()[i] = 0;
-
+//Todo: CHZ, there is an issue here with the number of elements retrieved
             tokens = ui->tableSender->item(line, 6)->text().split(" ");
             arr.clear();
             arr.reserve(tokens.count());

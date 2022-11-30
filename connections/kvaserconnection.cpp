@@ -17,7 +17,7 @@ driverData     m_channelData;
 driverData    *m_DriverConfig                 = &m_channelData;
 unsigned int   m_usedBaudRate                  = 0;
 
-//The below queuing mechanism is magically getting this informaito to the GUI
+//CHZ - The below queuing mechanism is magically getting this informaito to the GUI
 void KvaserConnection::testRecieve()
 {
     CANFrame* frame_p = getQueue().get();
@@ -46,6 +46,11 @@ void KvaserConnection::testRecieve()
         /* enqueue frame */
         getQueue().queue();
     }
+
+    WorkerThread *workerThread = new WorkerThread();
+    connect(workerThread, &WorkerThread::resultReady, this, &KvaserConnection::handleResults);
+    connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+    workerThread->start();
 }
 
 int TransmitMessage()
@@ -177,13 +182,13 @@ KvaserConnection::KvaserConnection() :
     mTimer.start(1000);
 
 
-
 }
 
 KvaserConnection::~KvaserConnection()
 {
     stop();
     //sendDebug("~SocketCANd()");
+
 }
 
 void KvaserConnection::piStarted()
@@ -223,12 +228,15 @@ bool KvaserConnection::piSendFrame(const CANFrame &pFrame)
     unsigned char msg[8];
     int           i;
 
+    volatile int test_payload_size = pFrame.payload().size();
+
     for(int i = 0; i < 8; i++)
     {
         msg[i] = pFrame.payload().at(i);
     }
 
-    canStatus stat = canWrite(m_DriverConfig->channel[0].hnd, pFrame.frameId(), msg, sizeof(pFrame.payload()), 4);
+
+    canStatus stat = canWrite(m_DriverConfig->channel[0].hnd, pFrame.frameId(), msg, /*pFrame.payload().size()*/8, 4);
 
     qDebug() << "kvaser can status: " << stat << Qt::endl;
 
@@ -272,5 +280,12 @@ void KvaserConnection::timerSlot()
 {
     static int counter = 0;
     qDebug() << "Timer firing as expected: " << counter++ << Qt::endl;
+
+}
+
+void KvaserConnection::handleResults(const QString &val)
+{
+    qDebug() << val << Qt::endl;
+
 
 }
